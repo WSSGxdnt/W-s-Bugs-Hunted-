@@ -13,7 +13,8 @@ router = APIRouter(prefix="/ordenes", tags=["Órdenes"])
 
 @router.get("/", response_model=List[OrdenResponse])
 async def obtener_ordenes(db: AsyncSession = Depends(obtener_bd)):
-    resultado = await db.execute(select(OrdenModel).options(selectinload(OrdenModel.mecanico))
+    resultado = await db.execute(select(OrdenModel).options(selectinload(OrdenModel.mecanico)))
+
     ordenes = resultado.scalars().all()
     return ordenes
 
