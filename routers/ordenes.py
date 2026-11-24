@@ -18,6 +18,22 @@ async def obtener_ordenes(db: AsyncSession = Depends(obtener_bd)):
 
 @router.post("/", status_code=201, response_model=OrdenResponse)
 async def crear_orden(orden: OrdenCreate, db: AsyncSession = Depends(obtener_bd)):
+
+    resultado_mecanico = await db.execute(
+        select(MecanicoModel).where(
+            MecanicoModel.id == orden.mecanico_id,
+            MecanicoModel.activo == True
+        )
+    )
+
+    mecanico = resultado_mecanico.scalar_one_or_none()
+
+    if mecanico is None:
+        raise HTTPException(
+            status_code=400,
+            detail="El mecanico no existe o esta desactivado"
+        )
+
     nueva_orden = OrdenModel(**orden.model_dump())
     db.add(nueva_orden)
     await db.commit()
